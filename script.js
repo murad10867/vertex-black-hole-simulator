@@ -91,34 +91,70 @@
 
   function update(dt) {
     const G = 145000 * gravityScale;
+    let replacements = 0;
 
     for (let i = bodies.length - 1; i >= 0; i--) {
       const b = bodies[i];
       const dx = holeX - b.x;
       const dy = holeY - b.y;
       const distSq = dx * dx + dy * dy;
-      const dist = Math.sqrt(distSq);
+      const dist = Math.max(1, Math.sqrt(distSq));
 
-      if (dist < EVENT_HORIZON) {
+      if (dist < EVENT_HORIZON + b.radius) {
         bodies.splice(i, 1);
         swallowed++;
+        replacements++;
         continue;
       }
 
       const safeDistSq = Math.max(distSq, 1900);
       const accel = G / safeDistSq;
+
+      // الجاذبية تسحب الكوكب، لكن إذا اقترب الثقب يبدأ الكوكب بالهرب.
       b.vx += (dx / dist) * accel * dt * 60;
       b.vy += (dy / dist) * accel * dt * 60;
+
+      const escapeDistance = 300;
+      if (dist < escapeDistance) {
+        const danger = 1 - (dist / escapeDistance);
+        const escapeForce = (230 + danger * 520) * dt;
+        b.vx -= (dx / dist) * escapeForce;
+        b.vy -= (dy / dist) * escapeForce;
+      }
+
+      const maxSpeed = 360;
+      const speed = Math.hypot(b.vx, b.vy);
+      if (speed > maxSpeed) {
+        b.vx = (b.vx / speed) * maxSpeed;
+        b.vy = (b.vy / speed) * maxSpeed;
+      }
 
       b.x += b.vx * dt * simSpeed;
       b.y += b.vy * dt * simSpeed;
 
-      b.trail.push({ x: b.x, y: b.y });
-      if (b.trail.length > 70) b.trail.shift();
-
-      if (b.x < -200 || b.x > W + 200 || b.y < -200 || b.y > H + 200) {
-        bodies.splice(i, 1);
+      // ترتد الكواكب من الحواف عشان تستمر المطاردة داخل الشاشة.
+      if (b.x < b.radius) {
+        b.x = b.radius;
+        b.vx = Math.abs(b.vx);
+      } else if (b.x > W - b.radius) {
+        b.x = W - b.radius;
+        b.vx = -Math.abs(b.vx);
       }
+
+      if (b.y < b.radius) {
+        b.y = b.radius;
+        b.vy = Math.abs(b.vy);
+      } else if (b.y > H - b.radius) {
+        b.y = H - b.radius;
+        b.vy = -Math.abs(b.vy);
+      }
+
+      b.trail.push({ x: b.x, y: b.y });
+      if (b.trail.length > 55) b.trail.shift();
+    }
+
+    for (let i = 0; i < replacements; i++) {
+      addRandomBody();
     }
 
     updateHud();
