@@ -34,6 +34,13 @@
   let lastTime = performance.now();
   let bodies = [];
   let stars = [];
+  const arrowKeys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false
+  };
+  const HOLE_MOVE_SPEED = 310;
 
   const palette = ['#56cfff','#ffd166','#ff7e67','#8f7cff','#7cf3a1','#f59cff','#71a7ff'];
 
@@ -233,9 +240,30 @@
     ctx.fillText('BLACK HOLE', holeX, holeY + EVENT_HORIZON + 32);
   }
 
+  function moveBlackHole(dt) {
+    let moveX = 0;
+    let moveY = 0;
+
+    if (arrowKeys.ArrowLeft) moveX -= 1;
+    if (arrowKeys.ArrowRight) moveX += 1;
+    if (arrowKeys.ArrowUp) moveY -= 1;
+    if (arrowKeys.ArrowDown) moveY += 1;
+
+    if (moveX !== 0 || moveY !== 0) {
+      const length = Math.hypot(moveX, moveY) || 1;
+      holeX += (moveX / length) * HOLE_MOVE_SPEED * dt;
+      holeY += (moveY / length) * HOLE_MOVE_SPEED * dt;
+
+      holeX = Math.max(EVENT_HORIZON + 18, Math.min(W - EVENT_HORIZON - 18, holeX));
+      holeY = Math.max(EVENT_HORIZON + 18, Math.min(H - EVENT_HORIZON - 18, holeY));
+    }
+  }
+
   function loop(now) {
     const dt = Math.min((now - lastTime) / 1000, .03);
     lastTime = now;
+
+    moveBlackHole(dt);
 
     if (running) update(dt);
     draw();
@@ -309,6 +337,26 @@
 
   canvas.addEventListener('pointerup', stopDragging);
   canvas.addEventListener('pointercancel', stopDragging);
+
+  window.addEventListener('keydown', (event) => {
+    if (Object.prototype.hasOwnProperty.call(arrowKeys, event.key)) {
+      event.preventDefault();
+      arrowKeys[event.key] = true;
+    }
+  }, { passive: false });
+
+  window.addEventListener('keyup', (event) => {
+    if (Object.prototype.hasOwnProperty.call(arrowKeys, event.key)) {
+      event.preventDefault();
+      arrowKeys[event.key] = false;
+    }
+  }, { passive: false });
+
+  window.addEventListener('blur', () => {
+    Object.keys(arrowKeys).forEach((key) => {
+      arrowKeys[key] = false;
+    });
+  });
 
   makeStars();
   resetBodies();
