@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050711">
+  <meta name="description" content="محاكي الثقب الأسود من Vertex Systems AI">
+  <title>Vertex Black Hole Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="security.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">BH</span>
+      <div>
+        <strong>Vertex Black Hole Simulator</strong>
+        <small>Vertex Systems AI</small>
+      </div>
+    </div>
+    <button id="pauseBtn" class="ghost-btn" type="button">إيقاف مؤقت</button>
+  </header>
+
+  <main class="page">
+    <section class="intro">
+      <span class="eyebrow">SPACE LAB</span>
+      <h1>محاكي الثقب الأسود</h1>
+      <p>شاهد الأجسام وهي تدور حول الثقب الأسود، ثم تنجذب نحوه كلما اقتربت أكثر.</p>
+    </section>
+
+    <section class="sim-layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>لوحة التحكم</h2>
+          <span id="statusBadge" class="status">يعمل</span>
+        </div>
+
+        <label class="control">
+          <span>قوة الجاذبية <strong id="gravityValue">1.0×</strong></span>
+          <input id="gravityRange" type="range" min="0.3" max="2.5" value="1" step="0.1">
+        </label>
+
+        <label class="control">
+          <span>سرعة المحاكاة <strong id="speedValue">1.0×</strong></span>
+          <input id="speedRange" type="range" min="0.3" max="2.2" value="1" step="0.1">
+        </label>
+
+        <label class="control">
+          <span>عدد الأجسام <strong id="bodyCount">8</strong></span>
+          <input id="bodyRange" type="range" min="1" max="20" value="8" step="1">
+        </label>
+
+        <div class="buttons">
+          <button id="addPlanetBtn" class="primary-btn" type="button">+ أضف كوكب</button>
+          <button id="resetBtn" class="secondary-btn" type="button">إعادة المحاكاة</button>
+        </div>
+
+        <div class="info-box">
+          <strong>جرّب بنفسك</strong>
+          <p>اضغط داخل الفضاء لإضافة جسم جديد في المكان الذي تختاره.</p>
+        </div>
+
+        <div class="stats">
+          <div>
+            <span>الأجسام الحالية</span>
+            <strong id="liveBodies">0</strong>
+          </div>
+          <div>
+            <span>ابتلعها الثقب</span>
+            <strong id="swallowed">0</strong>
+          </div>
+        </div>
+      </aside>
+
+      <section class="space-card">
+        <canvas id="spaceCanvas" width="1100" height="700" aria-label="محاكاة ثقب أسود وكواكب"></canvas>
+        <div class="legend">
+          <span><i class="dot planet-dot"></i> كوكب</span>
+          <span><i class="dot hole-dot"></i> أفق الحدث</span>
+          <span><i class="dot disk-dot"></i> قرص التراكم</span>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>Vertex Systems AI © 2026</footer>
+</body>
+</html>
